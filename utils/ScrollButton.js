@@ -1,33 +1,29 @@
 import { useState, useEffect } from "react";
-import { makeStyles } from "@mui/styles";
+import { styled } from "@mui/system";
 import Fab from "@mui/material/Fab";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-const useStyles = makeStyles({
-  scrollToTopButton: {
-    position: "fixed",
-    bottom: "20px",
-    right: "20px",
-    borderRadius: "50%",
+const ScrollToTopFab = styled(Fab)(({ theme }) => ({
+  position: "fixed",
+  bottom: "20px",
+  right: "20px",
+  borderRadius: "50%",
+  background: "#292929",
+  color: "white",
+  width: "50px",
+  height: "50px",
+  "&:hover": {
     background: "#292929",
-    color: "white",
-    width: "50px",
-    height: "50px",
-    "&:hover": {
-      background: "#292929",
-    },
   },
-  hidden: {
-    opacity: 0,
-    visibility: "hidden",
-    transition: "all 0.3s ease",
-  },
-  visible: {
+  opacity: 0,
+  visibility: "hidden",
+  transition: "all 0.3s ease",
+  // Define your styles for the visible state
+  "&.Mui-fab-visible": {
     opacity: 1,
     visibility: "visible",
-    transition: "all 0.3s ease",
   },
-});
+}));
 
 function ScrollButton() {
   const [isVisible, setIsVisible] = useState(false);
@@ -53,17 +49,13 @@ function ScrollButton() {
     });
   };
 
-  const classes = useStyles();
-
   return (
-    <Fab
-      className={`${classes.scrollToTopButton} ${
-        isVisible ? classes.visible : classes.hidden
-      }`}
+    <ScrollToTopFab
+      className={isVisible ? "Mui-fab-visible" : ""}
       onClick={scrollToTop}
     >
       <KeyboardArrowUpIcon />
-    </Fab>
+    </ScrollToTopFab>
   );
 }
 
