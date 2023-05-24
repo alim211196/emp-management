@@ -5,11 +5,7 @@ import BlogSection from "./blogSection";
 import { Box } from "@mui/material";
 import ScrollButton from "@/utils/ScrollButton";
 import { useDispatch } from "react-redux";
-
-import {
-  SearchWithFuse,
-  getCurrentDate,
-} from "@/utils/CustomFunction";
+import { SearchWithFuse, getCurrentDate } from "@/utils/CustomFunction";
 import DialogBox from "@/utils/DialogBox";
 import { openSnackbar } from "@/redux/reducer/Snackbar";
 
@@ -40,7 +36,7 @@ const AddBlogs = ({ value, currentUser }) => {
   };
 
   const getBlogs = () => {
-    fetch("http://localhost:3000/api/get_blogs")
+    fetch("http://localhost:3000/api?apiName=get_blogs")
       .then((response) => response?.json())
       .then((data) => {
         setBlogs(data?.data);
@@ -67,13 +63,16 @@ const AddBlogs = ({ value, currentUser }) => {
   const handleDelete = async () => {
     try {
       // Make API call to delete the employee
-      const response = await fetch("http://localhost:3000/api/delete_blog", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ _id: _id }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/api?apiName=delete_blog",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ _id: _id }),
+        }
+      );
       if (response.ok) {
         getBlogs();
         dispatch(
@@ -119,7 +118,7 @@ const AddBlogs = ({ value, currentUser }) => {
       return;
     }
 
-    fetch("http://localhost:3000/api/add_blog", {
+    fetch("http://localhost:3000/api?apiName=add_blog", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -147,11 +146,11 @@ const AddBlogs = ({ value, currentUser }) => {
     setIsDrawerOpen(flag);
     setID(id);
     setFlag("edit");
-    let currentUser = blogs.filter((i) => i._id === id);
+    let current_User = blogs.filter((i) => i._id === id);
     setFormData({
-      blog_title: currentUser[0].blog_title,
-      blog_description: currentUser[0].blog_description,
-      username: currentUser.username,
+      blog_title: current_User[0].blog_title,
+      blog_description: current_User[0].blog_description,
+      username: currentUser?.username,
       creation_date: formattedDate,
     });
   };
@@ -173,7 +172,7 @@ const AddBlogs = ({ value, currentUser }) => {
       );
       return;
     }
-    fetch("http://localhost:3000/api/update_blogs", {
+    fetch("http://localhost:3000/api?apiName=update_blogs", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

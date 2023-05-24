@@ -20,6 +20,7 @@
     "@mui/system": "^5.13.1",
     "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.4.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.2",

@@ -36,13 +36,16 @@ const EmployeeLogin = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/employee_login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "http://localhost:3000/api?apiName=employee_login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await response.json();
 
       if (response.ok) {

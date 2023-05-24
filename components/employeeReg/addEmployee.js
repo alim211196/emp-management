@@ -42,7 +42,7 @@ const AddEmployee = ({ value }) => {
   };
 
   const getEmployee = () => {
-    fetch("http://localhost:3000/api/get_employees")
+    fetch("http://localhost:3000/api?apiName=get_employees")
       .then((response) => response?.json())
       .then((data) => {
         setUsers(data?.data);
@@ -70,7 +70,7 @@ const AddEmployee = ({ value }) => {
     try {
       // Make API call to delete the employee
       const response = await fetch(
-        "http://localhost:3000/api/delete_employee",
+        "http://localhost:3000/api?apiName=delete_employee",
         {
           method: "POST",
           headers: {
@@ -135,7 +135,7 @@ const AddEmployee = ({ value }) => {
       return;
     }
 
-    fetch("http://localhost:3000/api/add_employee", {
+    fetch("http://localhost:3000/api?apiName=add_employee", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -205,7 +205,7 @@ const AddEmployee = ({ value }) => {
       return;
     }
 
-    fetch("http://localhost:3000/api/update_employee", {
+    fetch("http://localhost:3000/api?apiName=update_employee", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

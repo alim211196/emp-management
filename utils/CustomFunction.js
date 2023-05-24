@@ -47,14 +47,35 @@ export const handleChange = (event, setFormData) => {
   }));
 };
 
-export const convertDate = (date) => {
+export const convertDate = (date, addDays = 0) => {
   if (date instanceof Date) {
     const timeZoneOffset = date.getTimezoneOffset();
     const adjustedDate = new Date(date.getTime() + timeZoneOffset * 60000);
+
+    // Add one day to the adjusted date
+    adjustedDate.setDate(adjustedDate.getDate() + addDays);
+
     return adjustedDate.toISOString().split("T")[0];
   } else if (typeof date === "string") {
     const dateParts = date.split("T")[0].split("-");
-    return `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+
+    // Convert string date to a Date object
+    const dateObj = new Date(
+      parseInt(dateParts[0]),
+      parseInt(dateParts[1]) - 1,
+      parseInt(dateParts[2])
+    );
+
+    // Add one day to the date object
+    dateObj.setDate(dateObj.getDate() + addDays);
+
+    const adjustedDateParts = [
+      dateObj.getFullYear(),
+      String(dateObj.getMonth() + 1).padStart(2, "0"),
+      String(dateObj.getDate()).padStart(2, "0"),
+    ];
+
+    return `${adjustedDateParts[0]}-${adjustedDateParts[1]}-${adjustedDateParts[2]}`;
   } else {
     return "";
   }

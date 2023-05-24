@@ -15,7 +15,7 @@ const BlogSection = ({ blogs, handleOpen, handleEdit, currentUser }) => {
             </Typography>
             <Typography gutterBottom>
               {" "}
-              {convertDate(new Date(blog?.creation_date))} by {blog?.username}
+              {convertDate(new Date(blog?.creation_date), 1)} by {blog?.username}
             </Typography>
             <Typography gutterBottom>{blog?.blog_description}</Typography>
             <Box
