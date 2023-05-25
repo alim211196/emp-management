@@ -125,17 +125,32 @@ const AddBlogs = ({ value, currentUser }) => {
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        getBlogs();
-        setFormData(DataObj);
-        setIsDrawerOpen(false);
-        dispatch(
-          openSnackbar({
-            message: "Blog added successfully.",
-            severity: "success",
-          })
-        );
+      .then((response) => {
+        if (response.status === 200) {
+          getBlogs();
+          setFormData(DataObj);
+          setIsDrawerOpen(false);
+          dispatch(
+            openSnackbar({
+              message: "Blog added successfully.",
+              severity: "success",
+            })
+          );
+        } else if (response.status === 409) {
+          dispatch(
+            openSnackbar({
+              message: "Blog title already exists",
+              severity: "error",
+            })
+          );
+        } else {
+          dispatch(
+            openSnackbar({
+              message: "API not found",
+              severity: "error",
+            })
+          );
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -179,17 +194,32 @@ const AddBlogs = ({ value, currentUser }) => {
       },
       body: JSON.stringify({ _id: _id, ...formData }),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        getBlogs();
-        setIsDrawerOpen(false);
-        setFormData(DataObj);
-        dispatch(
-          openSnackbar({
-            message: "Blog updated successfully.",
-            severity: "success",
-          })
-        );
+      .then((response) => {
+        if (response.status === 200) {
+          getBlogs();
+          setIsDrawerOpen(false);
+          setFormData(DataObj);
+          dispatch(
+            openSnackbar({
+              message: "Blog updated successfully.",
+              severity: "success",
+            })
+          );
+        } else if (response.status === 409) {
+          dispatch(
+            openSnackbar({
+              message: "Blog title already exists",
+              severity: "error",
+            })
+          );
+        } else {
+          dispatch(
+            openSnackbar({
+              message: "API not found",
+              severity: "error",
+            })
+          );
+        }
       })
       .catch((error) => {
         console.error("Error:", error);

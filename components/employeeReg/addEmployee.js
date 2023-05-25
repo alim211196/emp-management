@@ -5,10 +5,7 @@ import TableSection from "./tableSection";
 import { Box } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "@/redux/reducer/Snackbar";
-import {
-  SearchWithFuse,
-  getCurrentDate,
-} from "@/utils/CustomFunction";
+import { SearchWithFuse, getCurrentDate } from "@/utils/CustomFunction";
 import DialogBox from "@/utils/DialogBox";
 const AddEmployee = ({ value }) => {
   const dispatch = useDispatch();
@@ -142,17 +139,32 @@ const AddEmployee = ({ value }) => {
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        getEmployee();
-        setFormData(DataObj);
-        setIsDrawerOpen(false);
-        dispatch(
-          openSnackbar({
-            message: "Employee added successfully.",
-            severity: "success",
-          })
-        );
+      .then((response) => {
+        if (response.status === 200) {
+          getEmployee();
+          setFormData(DataObj);
+          setIsDrawerOpen(false);
+          dispatch(
+            openSnackbar({
+              message: "Employee added successfully",
+              severity: "success",
+            })
+          );
+        } else if (response.status === 409) {
+          dispatch(
+            openSnackbar({
+              message: "Email or username already exists",
+              severity: "error",
+            })
+          );
+        } else {
+          dispatch(
+            openSnackbar({
+              message: "API not found",
+              severity: "error",
+            })
+          );
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -212,17 +224,32 @@ const AddEmployee = ({ value }) => {
       },
       body: JSON.stringify({ _id: _id, ...formData }),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        getEmployee();
-        setIsDrawerOpen(false);
-        setFormData(DataObj);
-        dispatch(
-          openSnackbar({
-            message: "Employee updated successfully.",
-            severity: "success",
-          })
-        );
+      .then((response) => {
+        if (response.status === 200) {
+          getEmployee();
+          setIsDrawerOpen(false);
+          setFormData(DataObj);
+          dispatch(
+            openSnackbar({
+              message: "Employee updated successfully.",
+              severity: "success",
+            })
+          );
+        } else if (response.status === 409) {
+          dispatch(
+            openSnackbar({
+              message: "Email or username already exists",
+              severity: "error",
+            })
+          );
+        } else {
+          dispatch(
+            openSnackbar({
+              message: "API not found",
+              severity: "error",
+            })
+          );
+        }
       })
       .catch((error) => {
         console.error("Error:", error);

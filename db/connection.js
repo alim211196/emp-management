@@ -13,6 +13,3 @@ export async function getClient() {
   return client;
 }
 
-
-
-export default pool;
