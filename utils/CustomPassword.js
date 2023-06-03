@@ -8,7 +8,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Typography } from "@mui/material";
 import { formatString, handleChange } from "./CustomFunction";
 
-
 const CustomPassword = ({ label, name, value, setFormData }) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -23,7 +22,7 @@ const CustomPassword = ({ label, name, value, setFormData }) => {
   return (
     <>
       <Typography
-        sx={{ color: "#292929", fontWeight: "500", fontSize: "14px" }}
+        sx={{ color: "#474747", fontWeight: "500", fontSize: "14px" }}
       >
         {label} <span style={{ color: "red", marginLeft: 5 }}>*</span>
       </Typography>
@@ -39,7 +38,7 @@ const CustomPassword = ({ label, name, value, setFormData }) => {
           placeholder={`Enter ${formattedOutput}`}
           value={value}
           onChange={(e) => handleChange(e, setFormData)}
-          id="outlined-adornment-password"
+          id={name}
           type={showPassword ? "text" : "password"}
           endAdornment={
             <InputAdornment position="end">

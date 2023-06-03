@@ -1,38 +1,87 @@
 import React, { memo, useState, useEffect } from "react";
 import TabBody from "@/utils/TabBody";
-import BlogDrawer from "./blogDrawer";
 import BlogSection from "./blogSection";
 import { Box } from "@mui/material";
-import ScrollButton from "@/utils/ScrollButton";
 import { useDispatch } from "react-redux";
 import { SearchWithFuse, getCurrentDate } from "@/utils/CustomFunction";
 import DialogBox from "@/utils/DialogBox";
 import { openSnackbar } from "@/redux/reducer/Snackbar";
+import BlogDialog from "./blogDialog";
+import { useRouter } from "next/router";
 
-const AddBlogs = ({ value, currentUser }) => {
+const AddBlogs = () => {
+  const [currentUser, setCurrentUser] = useState(() => {
+    const storedData = localStorage.getItem("currentUser");
+    return storedData ? JSON.parse(storedData) : null;
+  });
+
   const dispatch = useDispatch();
   const formattedDate = getCurrentDate();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [active, setActive] = useState(false);
   const DataObj = {
     blog_title: "",
     blog_description: "",
-    username: currentUser?.username,
+    created_by: currentUser?.username,
+    updated_by: "",
     creation_date: formattedDate,
+    employees_ids: [],
   };
 
   const [formData, setFormData] = useState(DataObj);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [blogs, setBlogs] = useState([]);
   const [_id, setID] = useState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [flag, setFlag] = useState("add");
+  const [loading, setLoading] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const router = useRouter();
 
-  const toggleDrawer = (open) => () => {
-    setIsDrawerOpen(open);
-    if (open === true) {
-      setFormData(DataObj);
+  const dashboardPath = router.pathname === "/admin-dashboard";
+  useEffect(() => {
+    // Retrieve data from localStorage when the component mounts
+    const storedData = localStorage.getItem("currentUser");
+    if (storedData) {
+      setCurrentUser(JSON.parse(storedData));
     }
+  }, []);
+
+  const handleFileInputChange = (e) => {
+    let files = e.target.files;
+    let fsize = files[0]?.size;
+
+    const file = Math.round(fsize / 1024);
+
+    if (file > 100) {
+      dispatch(
+        openSnackbar({
+          message: "Please upload image less than 1MB.",
+          severity: "error",
+        })
+      );
+      return;
+    }
+
+    let reader = new FileReader();
+    reader.readAsDataURL(files[0]);
+    reader.onload = (e) => {
+      setSelectedFile(e.target.result);
+    };
+  };
+  const handleClear = () => {
+    setSelectedFile(null);
+  };
+
+  const handleOpenDialog = () => {
+    setIsOpen(true);
     setFlag("add");
+  };
+  const handleCloseDialog = () => {
+    setFormData(DataObj);
+    setSelectedFile(null);
+    setIsOpen(false);
   };
 
   const getBlogs = () => {
@@ -49,35 +98,39 @@ const AddBlogs = ({ value, currentUser }) => {
 
   useEffect(() => {
     getBlogs();
-  }, [value]);
+  }, []);
 
   const handleClose = () => {
     setDialogOpen(false);
     setID();
   };
-  const handleOpen = (flag, id) => {
-    setDialogOpen(flag);
+  const handleActive = (flag, id) => {
+    setActive(flag);
+    setDialogOpen(true);
     setID(id);
   };
 
-  const handleDelete = async () => {
+  const handleBlogState = async () => {
     try {
-      // Make API call to delete the employee
+      // Make API call to update the blog's active status
       const response = await fetch(
-        "http://localhost:3000/api?apiName=delete_blog",
+        "http://localhost:3000/api?apiName=update_blog_active",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ _id: _id }),
+          body: JSON.stringify({ _id: _id, active: active }), // Set the 'active' value to false to deactivate the blog
         }
       );
       if (response.ok) {
         getBlogs();
         dispatch(
           openSnackbar({
-            message: "Blog Deleted Successfully",
+            message:
+              active === true
+                ? "Blog Activated Successfully"
+                : "Blog Deactivated Successfully",
             severity: "success",
           })
         );
@@ -85,7 +138,7 @@ const AddBlogs = ({ value, currentUser }) => {
       } else {
         dispatch(
           openSnackbar({
-            message: "Delete request failed.",
+            message: "Deactivation request failed.",
             severity: "error",
           })
         );
@@ -117,19 +170,26 @@ const AddBlogs = ({ value, currentUser }) => {
       );
       return;
     }
+    const newFormData = {
+      ...formData,
+      profileimage: selectedFile,
+      active: false,
+    };
 
+    setLoading(true);
     fetch("http://localhost:3000/api?apiName=add_blog", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(newFormData),
     })
       .then((response) => {
         if (response.status === 200) {
           getBlogs();
           setFormData(DataObj);
-          setIsDrawerOpen(false);
+          setIsOpen(false);
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "Blog added successfully.",
@@ -137,6 +197,7 @@ const AddBlogs = ({ value, currentUser }) => {
             })
           );
         } else if (response.status === 409) {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "Blog title already exists",
@@ -144,6 +205,7 @@ const AddBlogs = ({ value, currentUser }) => {
             })
           );
         } else {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "API not found",
@@ -153,21 +215,26 @@ const AddBlogs = ({ value, currentUser }) => {
         }
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Error:", error);
       });
   };
 
   const handleOpenEdit = (flag, id) => {
-    setIsDrawerOpen(flag);
+    setIsOpen(flag);
     setID(id);
     setFlag("edit");
-    let current_User = blogs.filter((i) => i._id === id);
+    let current_Blog = blogs.filter((i) => i._id === id);
     setFormData({
-      blog_title: current_User[0].blog_title,
-      blog_description: current_User[0].blog_description,
-      username: currentUser?.username,
+      blog_title: current_Blog[0].blog_title,
+      blog_description: current_Blog[0].blog_description,
+      created_by: current_Blog[0].created_by,
+      updated_by: currentUser?.username,
       creation_date: formattedDate,
+      employees_ids: current_Blog[0].employees_ids,
     });
+    setSelectedFile(current_Blog[0].profileimage);
+    setActive(current_Blog[0].active);
   };
 
   const handleEdit = (event) => {
@@ -187,18 +254,25 @@ const AddBlogs = ({ value, currentUser }) => {
       );
       return;
     }
+    const newFormData = {
+      ...formData,
+      profileimage: selectedFile,
+      active: active,
+    };
+    setLoading(true);
     fetch("http://localhost:3000/api?apiName=update_blogs", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ _id: _id, ...formData }),
+      body: JSON.stringify({ _id: _id, ...newFormData }),
     })
       .then((response) => {
         if (response.status === 200) {
           getBlogs();
-          setIsDrawerOpen(false);
+          setIsOpen(false);
           setFormData(DataObj);
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "Blog updated successfully.",
@@ -206,6 +280,7 @@ const AddBlogs = ({ value, currentUser }) => {
             })
           );
         } else if (response.status === 409) {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "Blog title already exists",
@@ -213,6 +288,7 @@ const AddBlogs = ({ value, currentUser }) => {
             })
           );
         } else {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "API not found",
@@ -222,6 +298,7 @@ const AddBlogs = ({ value, currentUser }) => {
         }
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Error:", error);
       });
   };
@@ -234,36 +311,52 @@ const AddBlogs = ({ value, currentUser }) => {
 
   return (
     <>
-      <Box sx={{ p: 3 }}>
+      <Box>
         <TabBody
-          title={"Blog Creation"}
+          title={
+            dashboardPath === true
+              ? "Recently created inactive blogs"
+              : "Blog Creation"
+          }
           btnText={"Create blog"}
-          toggleDrawer={toggleDrawer}
+          handleOpenDialog={handleOpenDialog}
           query={query}
           setQuery={setQuery}
+          hidden={hidden}
         >
           <BlogSection
             blogs={newResults}
-            handleOpen={handleOpen}
+            handleActive={handleActive}
             handleEdit={handleOpenEdit}
             currentUser={currentUser}
+            hidden={hidden}
+            setHidden={setHidden}
+            dashboardPath={dashboardPath}
+            getBlogs={getBlogs}
           />
         </TabBody>
-        <ScrollButton />
-        <BlogDrawer
-          isDrawerOpen={isDrawerOpen}
+        <BlogDialog
           handleSubmit={flag === "add" ? handleSubmit : handleEdit}
-          toggleDrawer={toggleDrawer}
           formData={formData}
           setFormData={setFormData}
           flag={flag}
+          handleCloseDialog={handleCloseDialog}
+          open={isOpen}
+          loading={loading}
+          selectedFile={selectedFile}
+          handleFileInputChange={handleFileInputChange}
+          handleClear={handleClear}
         />
       </Box>
       <DialogBox
         open={dialogOpen}
         handleClose={handleClose}
-        handleChange={handleDelete}
-        text={"Are your sure you want to delete this?"}
+        handleChange={handleBlogState}
+        text={
+          active === true
+            ? "Are your sure you want to activate this blog?"
+            : "Are your sure you want to deactivate this blog?"
+        }
       />
     </>
   );

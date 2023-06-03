@@ -11,7 +11,7 @@ import CustomSnackbar from "@/utils/CustomSnackbar";
 import WithAuth from "@/utils/withAuth";
 const clientSideEmotionCache = createEmotionCache();
 
-const MyApp =(props)=> {
+const MyApp = (props) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
 
   return (
@@ -28,6 +28,6 @@ const MyApp =(props)=> {
       </ThemeProvider>
     </CacheProvider>
   );
-}
+};
 
 export default WithAuth(MyApp);

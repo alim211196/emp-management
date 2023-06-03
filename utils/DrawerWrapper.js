@@ -12,11 +12,7 @@ const DrawerWrapper = ({
   children,
 }) => {
   return (
-    <Drawer
-      anchor="right"
-      open={isDrawerOpen}
-      onClose={toggleDrawer(false)}
-    >
+    <Drawer anchor="right" open={isDrawerOpen} onClose={toggleDrawer(false)}>
       <Box
         component="form"
         onSubmit={handleSubmit}

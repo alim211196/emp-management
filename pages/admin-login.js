@@ -6,11 +6,11 @@ import CustomPassword from "@/utils/CustomPassword";
 import CustomButton from "@/utils/CustomButton";
 import { openSnackbar } from "@/redux/reducer/Snackbar";
 import { useDispatch } from "react-redux";
-import { Box } from "@mui/material";
-import CustomLink from "@/utils/CustomLink";
 const AdminLogin = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -33,7 +33,7 @@ const AdminLogin = () => {
       );
       return;
     }
-
+    setLoading(true);
     try {
       const response = await fetch(
         "http://localhost:3000/api?apiName=admin_login",
@@ -48,14 +48,15 @@ const AdminLogin = () => {
       const data = await response.json();
 
       if (response.ok) {
+         localStorage.setItem("currentUser", JSON.stringify(data.user));
+         router.push("/admin-dashboard");
         dispatch(
           openSnackbar({
             message: data.message,
             severity: "success",
           })
         );
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
-        router.push("/admin-panel");
+       
       } else {
         dispatch(
           openSnackbar({
@@ -63,14 +64,16 @@ const AdminLogin = () => {
             severity: "error",
           })
         );
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error:", error);
+      setLoading(false);
     }
   };
 
   return (
-    <BoxWrapper title="Admin Login" handleSubmit={handleSubmit}>
+    <BoxWrapper title="Admin Login" handleSubmit={handleSubmit} maxWidth="xs">
       <CustomTextField
         label="Username"
         name="username"
@@ -84,12 +87,7 @@ const AdminLogin = () => {
         value={formData.password}
         setFormData={setFormData}
       />
-      <CustomButton text={"Login"} />
-      <Box
-        sx={{mt:1, display: "flex", alignItem: "center", justifyContent: "center" }}
-      >
-        <CustomLink link="/employee-login" title="Are you employee?" />
-      </Box>
+      <CustomButton text={"Login"} disabled={loading} />
     </BoxWrapper>
   );
 };

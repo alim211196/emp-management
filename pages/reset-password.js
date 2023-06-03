@@ -5,9 +5,12 @@ import BoxWrapper from "@/utils/BoxWrapper";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "@/redux/reducer/Snackbar";
 import { useRouter } from "next/router";
+import CustomTextField from "@/utils/CustomTextField";
 const ResetPassword = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
+    otp: "",
     new_password: "",
     confirm_password: "",
   });
@@ -32,7 +35,7 @@ const ResetPassword = () => {
       return;
     }
 
-    const { new_password, confirm_password } = data;
+    const { new_password, confirm_password, otp } = data;
     if (new_password !== confirm_password) {
       dispatch(
         openSnackbar({
@@ -42,10 +45,23 @@ const ResetPassword = () => {
       );
       return;
     }
-  const newFormData = {
-    _id: _id,
-    new_password: data.new_password,
-  };
+    if (otp.length !== 6) {
+      dispatch(
+        openSnackbar({
+          message: "OTP should be 6 digits long.",
+          severity: "error",
+        })
+      );
+      return;
+    }
+
+    const newFormData = {
+      _id: _id,
+      new_password: data.new_password,
+      otp: data.otp,
+    };
+
+    setLoading(true);
     try {
       const response = await fetch(
         "http://localhost:3000/api?apiName=reset_password",
@@ -67,9 +83,11 @@ const ResetPassword = () => {
           })
         );
         router.push("/employee-login");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error:", error);
+      setLoading(false);
       dispatch(
         openSnackbar({
           message: "An error occurred. Please try again.",
@@ -79,7 +97,18 @@ const ResetPassword = () => {
     }
   };
   return (
-    <BoxWrapper title="Reset Password" handleSubmit={handleSubmit}>
+    <BoxWrapper
+      title="Reset Password"
+      handleSubmit={handleSubmit}
+      maxWidth="xs"
+    >
+      <CustomTextField
+        label="OTP"
+        name="otp"
+        type="number"
+        value={formData.otp}
+        setFormData={setFormData}
+      />
       <CustomPassword
         label="New Password"
         name="new_password"
@@ -92,7 +121,7 @@ const ResetPassword = () => {
         value={formData.confirm_password}
         setFormData={setFormData}
       />
-      <CustomButton text={"Reset password"} />
+      <CustomButton text={"Reset password"} disabled={loading} />
     </BoxWrapper>
   );
 };

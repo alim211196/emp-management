@@ -6,10 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { Box } from "@mui/material";
 import { Transition } from "./CustomFunction";
 
-
-
-const DialogBox = ({ open, handleClose, handleChange,text }) => {
-
+const DialogBox = ({ open, handleClose, handleChange, text }) => {
   return (
     <div>
       <Dialog
@@ -18,21 +15,13 @@ const DialogBox = ({ open, handleClose, handleChange,text }) => {
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
-        sx={{zIndex:1000}}
+        sx={{ zIndex: 1000 }}
       >
         <Box>
           <DialogTitle>{text}</DialogTitle>
           <DialogActions>
-            <Button
-              onClick={() => handleClose()}
-            >
-              No
-            </Button>
-            <Button
-              onClick={() => handleChange()}
-            >
-              Yes
-            </Button>
+            <Button onClick={() => handleClose()}>No</Button>
+            <Button onClick={() => handleChange()}>Yes</Button>
           </DialogActions>
         </Box>
       </Dialog>

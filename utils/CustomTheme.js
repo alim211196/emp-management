@@ -2,7 +2,6 @@ import React, { memo } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const CustomTheme = ({ children }) => {
-
   const theme = createTheme({
     palette: {
       primary: {
@@ -21,18 +20,18 @@ const CustomTheme = ({ children }) => {
           root: {
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                color: "#292929",
-                borderColor: "#292929",
+                color: "#474747",
+                borderColor: "#474747",
               },
             },
             "& .MuiOutlinedInput-root.Mui-disabled": {
               "& fieldset": {
-                color: "#292929",
-                borderColor: "#292929",
+                color: "#474747",
+                borderColor: "#474747",
               },
             },
             "& .MuiOutlinedInput-root:hover fieldset": {
-              borderColor: "#292929",
+              borderColor: "#474747",
             },
             "& .MuiOutlinedInput-root.Mui-disabled:hover fieldset": {
               borderColor: "#fff",
@@ -61,12 +60,12 @@ const CustomTheme = ({ children }) => {
           root: {
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                color:"#292929",
-                borderColor:"#292929", // change border color
+                color: "#474747",
+                borderColor: "#474747", // change border color
               },
             },
             "& .MuiOutlinedInput-root:hover fieldset": {
-              borderColor:"#292929",
+              borderColor: "#474747",
             },
             "& .MuiOutlinedInput-input": {
               color: "#fff",

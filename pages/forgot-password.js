@@ -9,6 +9,7 @@ import { openSnackbar } from "@/redux/reducer/Snackbar";
 import { useDispatch } from "react-redux";
 
 const ForgotPassword = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ const ForgotPassword = () => {
       );
       return;
     }
-
+    setLoading(true);
     try {
       const response = await fetch(
         "http://localhost:3000/api?apiName=forgot_password",
@@ -57,6 +58,7 @@ const ForgotPassword = () => {
           pathname: "/reset-password",
           query: { _id: data._id },
         });
+        setLoading(false);
       }
     } catch (error) {
       dispatch(
@@ -65,10 +67,15 @@ const ForgotPassword = () => {
           severity: "error",
         })
       );
+      setLoading(false);
     }
   };
   return (
-    <BoxWrapper title="Forgot Password" handleSubmit={handleSubmit}>
+    <BoxWrapper
+      title="Forgot Password"
+      handleSubmit={handleSubmit}
+      maxWidth="xs"
+    >
       <CustomTextField
         label="Email Address"
         name="email"
@@ -76,17 +83,16 @@ const ForgotPassword = () => {
         value={formData.email}
         setFormData={setFormData}
       />
-      <CustomButton text={"Forgot password"} />
+      <CustomButton text={"Forgot password"} disabled={loading} />
       <Box
         sx={{
           mt: 1,
           display: "flex",
           alignItem: "center",
-          justifyContent: "space-between",
+          justifyContent: "center",
         }}
       >
-        <CustomLink link="/employee-login" title="Employee" />
-        <CustomLink link="/admin-login" title="Admin" />
+        <CustomLink link="/employee-login" title="Go back to employee login" />
       </Box>
     </BoxWrapper>
   );

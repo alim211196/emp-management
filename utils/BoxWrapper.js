@@ -1,7 +1,7 @@
 import { Box, Paper, Container, CssBaseline, Typography } from "@mui/material";
 import React, { memo } from "react";
 import Header from "@/utils/Header";
-const BoxWrapper = ({ title, children, handleSubmit }) => {
+const BoxWrapper = ({ title, children, handleSubmit, maxWidth }) => {
   return (
     <Box
       sx={{
@@ -23,7 +23,7 @@ const BoxWrapper = ({ title, children, handleSubmit }) => {
           justifyContent: "center",
         }}
       >
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth={maxWidth}>
           <CssBaseline />
           <Paper
             elevation={0}
@@ -31,13 +31,14 @@ const BoxWrapper = ({ title, children, handleSubmit }) => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              p: 4,pb:2,
+              p: 4,
+              pb: 2,
               background: "rgba(255, 255, 255, 0.7)",
             }}
           >
             <Typography
               sx={{
-                color: "#292929",
+                color: "#474747",
                 fontSize: "32px",
                 fontWeight: "bold",
                 textAlign: "center",

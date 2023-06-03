@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { openSnackbar } from "@/redux/reducer/Snackbar";
 
 const EmployeeLogin = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ const EmployeeLogin = () => {
       );
       return;
     }
-
+    setLoading(true);
     try {
       const response = await fetch(
         "http://localhost:3000/api?apiName=employee_login",
@@ -47,16 +48,24 @@ const EmployeeLogin = () => {
         }
       );
       const data = await response.json();
-
-      if (response.ok) {
+      if (data.status === 200) {
         dispatch(
           openSnackbar({
-            message: data.message,
+            message: "Login successful",
             severity: "success",
           })
         );
         localStorage.setItem("currentUser", JSON.stringify(data.user));
         router.push("/dashboard");
+      } else if (data.status === 409) {
+        dispatch(
+          openSnackbar({
+            message:
+              "Your account is temporarily deactivated. Please contact the administrator.",
+            severity: "error",
+          })
+        );
+        setLoading(false);
       } else {
         dispatch(
           openSnackbar({
@@ -64,14 +73,20 @@ const EmployeeLogin = () => {
             severity: "error",
           })
         );
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error:", error);
+      setLoading(false);
     }
   };
 
   return (
-    <BoxWrapper title="Employee Login" handleSubmit={handleSubmit}>
+    <BoxWrapper
+      title="Employee Login"
+      handleSubmit={handleSubmit}
+      maxWidth="xs"
+    >
       <CustomTextField
         label="Username"
         name="username"
@@ -85,7 +100,7 @@ const EmployeeLogin = () => {
         value={formData.password}
         setFormData={setFormData}
       />
-      <CustomButton text={"Login"} />
+      <CustomButton text={"Login"} disabled={loading} />
       <Box
         sx={{
           mt: 1,

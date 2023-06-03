@@ -1,15 +1,13 @@
-
 import { TextField, Typography } from "@mui/material";
-import React,{memo} from "react";
+import React, { memo } from "react";
 import { formatString, handleChange } from "./CustomFunction";
 const MultilineTextField = ({ label, name, type, value, setFormData }) => {
-
-     const formattedOutput = formatString(name);
+  const formattedOutput = formatString(name);
 
   return (
     <>
       <Typography
-        sx={{ color: "#292929", fontWeight: "500", fontSize: "14px" }}
+        sx={{ color: "#474747", fontWeight: "500", fontSize: "14px" }}
       >
         {label} <span style={{ color: "red", marginLeft: 5 }}>*</span>
       </Typography>

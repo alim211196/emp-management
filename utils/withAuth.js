@@ -7,12 +7,17 @@ const WithAuth = (WrappedComponent) => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
 
+    const path = [
+      "/employee-login",
+      "/admin-login",
+      "/forgot-password",
+    ].includes(router.pathname);
     useEffect(() => {
       const checkAuth = async () => {
         const isLoggedIn =
           typeof localStorage !== "undefined" &&
           localStorage.getItem("currentUser");
-        if (!isLoggedIn) {
+        if (!isLoggedIn && !path) {
           await router.replace("/"); // Redirect to the login page if not logged in
         }
         setIsLoading(false);

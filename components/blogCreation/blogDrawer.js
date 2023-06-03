@@ -9,7 +9,7 @@ const BlogDrawer = ({
   toggleDrawer,
   formData,
   setFormData,
-  flag
+  flag,
 }) => {
   return (
     <DrawerWrapper

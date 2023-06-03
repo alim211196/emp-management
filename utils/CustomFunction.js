@@ -88,7 +88,7 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 export const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
-  border: "1px solid #292929",
+  border: "1px solid #474747",
   marginRight: "10px",
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   "&:hover": {
@@ -103,7 +103,7 @@ export const Search = styled("div")(({ theme }) => ({
 }));
 
 export const SearchIconWrapper = styled("div")(({ theme }) => ({
-  color:"#292929",
+  color: "#474747",
   padding: theme.spacing(0, 2),
   height: "100%",
   position: "absolute",

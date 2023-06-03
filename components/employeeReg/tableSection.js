@@ -12,9 +12,10 @@ import {
 } from "@mui/material";
 import React, { memo, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import PersonIcon from "@mui/icons-material/Person";
+import PersonOffIcon from "@mui/icons-material/PersonOff";
 import CommonTableCell from "@/utils/CommonTableCell";
-const TableSection = ({ data, handleOpen, handleEdit }) => {
+const TableSection = ({ data, handleActive, handleEdit }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const handleChangePage = (event, newPage) => {
@@ -59,8 +60,9 @@ const TableSection = ({ data, handleOpen, handleEdit }) => {
 
           <TableBody>
             {data
+              ?.filter((i) => i.user_type !== "admin")
               ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((item, index) => (
+              ?.map((item, index) => (
                 <TableRow key={item._id}>
                   <CommonTableCell align="left" width="10%">
                     {index + 1}
@@ -84,9 +86,22 @@ const TableSection = ({ data, handleOpen, handleEdit }) => {
                         <EditIcon sx={{ fontSize: 20 }} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete" placement="top">
-                      <IconButton onClick={() => handleOpen(true, item._id)}>
-                        <DeleteIcon sx={{ fontSize: 20 }} />
+                    <Tooltip
+                      title={item.active === false ? "Inactive" : "Active"}
+                      placement="top"
+                    >
+                      <IconButton
+                        onClick={() => {
+                          item.active === false
+                            ? handleActive(true, item._id)
+                            : handleActive(false, item._id);
+                        }}
+                      >
+                        {item.active === false ? (
+                          <PersonOffIcon sx={{ fontSize: 20, color: "red" }} />
+                        ) : (
+                          <PersonIcon sx={{ fontSize: 20, color: "green" }} />
+                        )}
                       </IconButton>
                     </Tooltip>
                   </CommonTableCell>
@@ -98,7 +113,7 @@ const TableSection = ({ data, handleOpen, handleEdit }) => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 20]}
         component="div"
-        count={data?.length}
+        count={data?.filter((i) => i.user_type !== "admin")?.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

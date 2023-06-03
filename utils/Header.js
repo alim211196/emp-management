@@ -8,24 +8,36 @@ import {
   Typography,
   IconButton,
   Box,
-  Avatar,
 } from "@mui/material";
-import FadeMenu from "./Menubar";
-import { CardName } from "./CustomFunction";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
+import BasicMenu from "./BasicMenu";
 const Header = () => {
-  const [currentUser,setCurrentUser] = useState(() => {
+  const matches = useMediaQuery("(min-width:600px)");
+  const [currentUser, setCurrentUser] = useState(() => {
     const storedData = localStorage.getItem("currentUser");
     return storedData ? JSON.parse(storedData) : null;
   });
-  const router = useRouter();
-  const CommonButton = (link, text) => {
-    return link === router.pathname ? null : (
-      <Button color="inherit" onClick={() => router.push(link)}>
-        {text}
-      </Button>
-    );
-  };
 
+  const router = useRouter();
+  const path = [
+    "/employee-login",
+    "/admin-login",
+    "/forgot-password",
+    "/reset-password",
+  ].includes(router.pathname);
+
+  const CommonButton = (link, text) => {
+    if (path) {
+      return null;
+    } else {
+      return link === router.pathname ? null : (
+        <Button color="inherit" onClick={() => router.push(link)}>
+          {text}
+        </Button>
+      );
+    }
+  };
   useEffect(() => {
     // Retrieve data from localStorage when the component mounts
     const storedData = localStorage.getItem("currentUser");
@@ -34,9 +46,27 @@ const Header = () => {
     }
   }, []);
 
+  const UIConditions = () => {
+    if (!path) {
+      if (matches) {
+        return (
+          <>
+            {CommonButton("/", "Home")}
+            {CommonButton("/about-us", "About us")}
+            {CommonButton("/contact-us", "Contact us")}
+            {CommonButton("/blogs", "Blogs")}
+          </>
+        );
+      } else {
+        return <BasicMenu router={router} />;
+      }
+      return null;
+    }
+  };
+
   return (
     <>
-      <AppBar position="fixed" sx={{ background: "#292929" }}>
+      <AppBar position="fixed" sx={{ background: "#474747" }}>
         <Toolbar>
           <IconButton
             size="large"
@@ -53,7 +83,7 @@ const Header = () => {
               !currentUser?.user_type && router.push("/");
             }}
           >
-            Employee Management
+            Blogging World
           </Typography>
           <Box
             sx={{
@@ -62,19 +92,7 @@ const Header = () => {
               justifyContent: "space-between",
             }}
           >
-            {currentUser ? (
-              <>
-                <Avatar sx={{ fontSize: 24 }}>
-                  {CardName(currentUser?.username)}
-                </Avatar>
-                <FadeMenu router={router} user={currentUser} />
-              </>
-            ) : (
-              <>
-                {CommonButton("/employee-login", "Employee")}
-                {CommonButton("/admin-login", "Admin")}
-              </>
-            )}
+            <UIConditions />
           </Box>
         </Toolbar>
       </AppBar>

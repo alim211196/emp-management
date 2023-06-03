@@ -1,14 +1,10 @@
 import React, { memo } from "react";
-import {
-  TableCell,
-  styled,
-  tableCellClasses,
-} from "@mui/material";
+import { TableCell, styled, tableCellClasses } from "@mui/material";
 
-const CommonTableCell = ({ align,width, children }) => {
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const CommonTableCell = ({ align, width, children }) => {
+  const StyledTableCell = styled(TableCell)(({ }) => ({
     [`&.${tableCellClasses.head}`]: {
-      background: "#292929",
+      background: "#474747",
       color: "#fff",
     },
     [`&.${tableCellClasses.body}`]: {

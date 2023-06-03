@@ -1,5 +1,4 @@
 import React, { memo, useState, useEffect } from "react";
-import EmployeeDrawer from "./employeeDrawer";
 import TabBody from "@/utils/TabBody";
 import TableSection from "./tableSection";
 import { Box } from "@mui/material";
@@ -7,15 +6,19 @@ import { useDispatch } from "react-redux";
 import { openSnackbar } from "@/redux/reducer/Snackbar";
 import { SearchWithFuse, getCurrentDate } from "@/utils/CustomFunction";
 import DialogBox from "@/utils/DialogBox";
-const AddEmployee = ({ value }) => {
+import EmployeeDialog from "./employeeDialog";
+
+const AddEmployee = () => {
   const dispatch = useDispatch();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [_id, setID] = useState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const formattedDate = getCurrentDate();
   const [flag, setFlag] = useState("add");
   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [active, setActive] = useState(false);
   const DataObj = {
     firstname: "",
     lastname: "",
@@ -29,15 +32,14 @@ const AddEmployee = ({ value }) => {
     ...DataObj,
     confirm_password: "",
   });
-
-  const toggleDrawer = (open) => () => {
-    setIsDrawerOpen(open);
-    if (open === true) {
-      setFormData(DataObj);
-    }
+  const handleOpenDialog = () => {
+    setIsOpen(true);
     setFlag("add");
   };
-
+  const handleCloseDialog = () => {
+    setIsOpen(false);
+    setFormData(DataObj);
+  };
   const getEmployee = () => {
     fetch("http://localhost:3000/api?apiName=get_employees")
       .then((response) => response?.json())
@@ -51,36 +53,40 @@ const AddEmployee = ({ value }) => {
   };
   useEffect(() => {
     getEmployee();
-  }, [value]);
+  }, []);
 
   const handleClose = () => {
     setFormData(DataObj);
     setDialogOpen(false);
     setID();
   };
-  const handleOpen = (flag, id) => {
+  const handleActive = (flag, id) => {
+    setActive(flag);
     setFormData(DataObj);
-    setDialogOpen(flag);
+    setDialogOpen(true);
     setID(id);
   };
-  const handleDelete = async () => {
+  const handleActiveState = async () => {
     try {
-      // Make API call to delete the employee
+      // Make API call to update the blog's active status
       const response = await fetch(
-        "http://localhost:3000/api?apiName=delete_employee",
+        "http://localhost:3000/api?apiName=update_employee_active",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ _id: _id }),
+          body: JSON.stringify({ _id: _id, active: active }), // Set the 'active' value to false to deactivate the blog
         }
       );
       if (response.ok) {
         getEmployee();
         dispatch(
           openSnackbar({
-            message: "Employee Deleted Successfully.",
+            message:
+              active === true
+                ? "Employee Activated Successfully"
+                : "Employee Deactivated Successfully",
             severity: "success",
           })
         );
@@ -88,7 +94,7 @@ const AddEmployee = ({ value }) => {
       } else {
         dispatch(
           openSnackbar({
-            message: "Delete request failed.",
+            message: "Deactivation request failed.",
             severity: "error",
           })
         );
@@ -131,19 +137,24 @@ const AddEmployee = ({ value }) => {
       );
       return;
     }
-
+    const newFormData = {
+      ...formData,
+      active: false,
+    };
+    setLoading(true);
     fetch("http://localhost:3000/api?apiName=add_employee", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(newFormData),
     })
       .then((response) => {
         if (response.status === 200) {
+          setLoading(false);
           getEmployee();
           setFormData(DataObj);
-          setIsDrawerOpen(false);
+          setIsOpen(false);
           dispatch(
             openSnackbar({
               message: "Employee added successfully",
@@ -151,6 +162,7 @@ const AddEmployee = ({ value }) => {
             })
           );
         } else if (response.status === 409) {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "Email or username already exists",
@@ -158,6 +170,7 @@ const AddEmployee = ({ value }) => {
             })
           );
         } else {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "API not found",
@@ -167,25 +180,27 @@ const AddEmployee = ({ value }) => {
         }
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Error:", error);
       });
   };
 
   const handleOpenEdit = (flag, id) => {
-    setIsDrawerOpen(flag);
+    setIsOpen(flag);
     setID(id);
     setFlag("edit");
-    let currentUser = users.filter((i) => i._id === id);
+    let current_User = users.filter((i) => i._id === id);
     setFormData({
-      firstname: currentUser[0].firstname,
-      lastname: currentUser[0].lastname,
-      email: currentUser[0].email,
-      username: currentUser[0].username,
-      user_type: currentUser[0].user_type,
-      password: currentUser[0].password,
+      firstname: current_User[0].firstname,
+      lastname: current_User[0].lastname,
+      email: current_User[0].email,
+      username: current_User[0].username,
+      user_type: current_User[0].user_type,
+      password: current_User[0].password,
       creation_date: formattedDate,
-      confirm_password: currentUser[0].password,
+      confirm_password: current_User[0].password,
     });
+    setActive(current_User[0].active);
   };
 
   const handleEdit = (event) => {
@@ -216,19 +231,24 @@ const AddEmployee = ({ value }) => {
       );
       return;
     }
-
+    const newFormData = {
+      ...formData,
+      active: false,
+    };
+    setLoading(true);
     fetch("http://localhost:3000/api?apiName=update_employee", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ _id: _id, ...formData }),
+      body: JSON.stringify({ _id: _id, ...newFormData }),
     })
       .then((response) => {
         if (response.status === 200) {
           getEmployee();
-          setIsDrawerOpen(false);
+          setIsOpen(false);
           setFormData(DataObj);
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "Employee updated successfully.",
@@ -236,6 +256,7 @@ const AddEmployee = ({ value }) => {
             })
           );
         } else if (response.status === 409) {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "Email or username already exists",
@@ -243,6 +264,7 @@ const AddEmployee = ({ value }) => {
             })
           );
         } else {
+          setLoading(false);
           dispatch(
             openSnackbar({
               message: "API not found",
@@ -252,6 +274,7 @@ const AddEmployee = ({ value }) => {
         }
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Error:", error);
       });
   };
@@ -263,34 +286,40 @@ const AddEmployee = ({ value }) => {
   );
   return (
     <>
-      <Box sx={{ p: 3 }}>
+      <Box>
         <TabBody
           title={"Employee Registration"}
           btnText={"Add Employee"}
-          toggleDrawer={toggleDrawer}
+          handleOpenDialog={handleOpenDialog}
           query={query}
           setQuery={setQuery}
+          hidden={false}
         >
           <TableSection
             data={newResults}
-            handleOpen={handleOpen}
+            handleActive={handleActive}
             handleEdit={handleOpenEdit}
           />
         </TabBody>
-        <EmployeeDrawer
-          isDrawerOpen={isDrawerOpen}
+        <EmployeeDialog
           handleSubmit={flag === "add" ? handleSubmit : handleEdit}
-          toggleDrawer={toggleDrawer}
           formData={formData}
           setFormData={setFormData}
           flag={flag}
+          handleCloseDialog={handleCloseDialog}
+          open={isOpen}
+          loading={loading}
         />
       </Box>
       <DialogBox
         open={dialogOpen}
         handleClose={handleClose}
-        handleChange={handleDelete}
-        text={"Are your sure you want to delete this?"}
+        handleChange={handleActiveState}
+        text={
+          active === true
+            ? "Are your sure you want to activate this employee account?"
+            : "Are your sure you want to deactivate this employee account?"
+        }
       />
     </>
   );
