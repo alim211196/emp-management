@@ -84,7 +84,7 @@ const AboutUs = () => {
           offers. Connect with us on social media platforms to stay up-to-date
           with the latest articles and engage with fellow readers. Thank you for
           visiting [Blog Website Name]. We hope you find our blog a source of
-          inspiration, knowledge, and entertainment. Together, let's embark on a
+          inspiration, knowledge, and entertainment. Together, let is embark on a
           journey of exploration and discovery. Happy reading!
         </Typography>
       </Box>

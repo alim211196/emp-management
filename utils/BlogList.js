@@ -7,11 +7,11 @@ import Avatar from "@mui/material/Avatar";
 import { CardName, convertDate } from "./CustomFunction";
 import { Box, Divider } from "@mui/material";
 
-const BlogList = ({ index, blogs, children }) => {
+const BlogList = ({ blogs, children }) => {
   const secondaryText =
     convertDate(new Date(blogs?.creation_date), 1) + " by " + blogs?.created_by;
   return (
-    <Box key={index}>
+    <>
       <Box
         sx={{
           display: "flex",
@@ -38,7 +38,7 @@ const BlogList = ({ index, blogs, children }) => {
       </Box>
 
       <Divider />
-    </Box>
+    </>
   );
 };
 

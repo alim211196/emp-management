@@ -33,12 +33,12 @@ const HomePage = () => {
           Insightful Musings: A Blog by Our Dedicated Team
         </Typography>
         <Typography variant="body1" gutterBottom>
-          "Welcome to Insightful Musings, a captivating blog crafted by our
+          Welcome to Insightful Musings, a captivating blog crafted by our
           exceptional team of employees and administrators. Join us on a journey
           of knowledge and discovery as we delve into a wide range of topics,
           offering unique perspectives and thought-provoking insights. At
           Insightful Musings, we are passionate about sharing our expertise,
-          experiences, and opinions with our readers. Whether you're seeking
+          experiences, and opinions with our readers. Whether you are seeking
           guidance on personal growth, exploring the latest trends in
           technology, or looking for travel inspiration, our blog covers it all.
           Our diverse team brings together a wealth of knowledge and a shared
@@ -53,7 +53,7 @@ const HomePage = () => {
           Unlock a world of captivating storytelling and insightful perspectives
           at Insightful Musings. Embark on this enriching journey with us, and
           let our blog become your trusted source of knowledge, inspiration, and
-          entertainment. Happy reading!"
+          entertainment. Happy reading!
         </Typography>
         <List component="nav" aria-label="Blog categories">
           <ListItem button>

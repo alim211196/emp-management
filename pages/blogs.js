@@ -83,13 +83,15 @@ const Blogs = () => {
               .filter((i) => i.active === true)
               .map((item, index) => {
                 return (
-                  <BlogList index={index} blogs={item}>
-                    <Tooltip title="Go to view full blog" placement="top">
-                      <IconButton onClick={() => openBlog(true, item?._id)}>
-                        <LaunchIcon sx={{ color: "#474747" }} />
-                      </IconButton>
-                    </Tooltip>
-                  </BlogList>
+                  <Box key={index}>
+                    <BlogList blogs={item}>
+                      <Tooltip title="Go to view full blog" placement="top">
+                        <IconButton onClick={() => openBlog(true, item?._id)}>
+                          <LaunchIcon sx={{ color: "#474747" }} />
+                        </IconButton>
+                      </Tooltip>
+                    </BlogList>
+                  </Box>
                 );
               })}
           </>

@@ -242,7 +242,7 @@ const BlogSection = ({
     >
       <Draw />
       <Typography sx={{ fontSize: 20 }}>
-        You Don't have any blog available please create new one.
+        You Don not have any blog available please create new one.
       </Typography>
     </Box>
   );
